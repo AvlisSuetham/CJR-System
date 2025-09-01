@@ -1,105 +1,168 @@
-# Neno Drive
+# CJR-System
 
-Neno Drive é um sistema de gerenciamento de arquivos e usuários, desenvolvido para fins escolares. Ele permite que alunos, professores e administradores cadastrem-se, façam upload de arquivos, visualizem pastas e gerenciem senhas de forma segura e organizada.
+![CJR-System](https://img.shields.io/badge/CJR--System-ready-brightgreen) ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.0-8892BF) ![XAMPP](https://img.shields.io/badge/XAMPP-local-orange)
 
----
-
-## Funcionalidades
-
-* **Cadastro de usuários**
-  Alunos podem se cadastrar diretamente no sistema.
-  Professores e administradores podem gerenciar senhas de alunos.
-
-* **Login seguro**
-  Sistema de login com senha criptografada utilizando `password_hash()`.
-
-* **Dashboard personalizado**
-
-  * Alunos: acessam apenas seus próprios arquivos.
-  * Professores: acessam todas as pastas e podem pesquisar pastas de alunos.
-  * Administradores: acesso completo a todas as pastas e arquivos.
-
-* **Upload e gerenciamento de arquivos**
-
-  * Cada usuário tem sua própria pasta de uploads.
-  * Professores e administradores podem visualizar e excluir arquivos.
-  * Alunos podem visualizar e excluir apenas seus próprios arquivos.
-
-* **Alteração de senha**
-
-  * Alunos podem alterar suas próprias senhas.
-  * Professores e administradores podem alterar a senha de qualquer aluno.
-
-* **Interface moderna e responsiva**
-
-  * Tema laranja consistente.
-  * Layout limpo e profissional.
-  * Botões com efeitos de hover e sombras sutis.
+**CJR-System** é um sistema de gerenciamento de arquivos desenvolvido em PHP, pensado especialmente para uso educacional. Ele reúne funções essenciais como cadastro e autenticação de usuários, CRUD de usuários, upload/gestão de arquivos e um **painel inicial com ferramentas úteis para alunos**.
 
 ---
 
-## Tecnologias Utilizadas
+## Sobre o projeto
 
-* PHP 8+
+Desenvolvido por **Matheus Pereira da Silva** (CEO da Sophira) para o **Centro da Juventude e Restinga**.
+
+Mais sobre o desenvolvedor e outros projetos: [https://sophira.me](https://sophira.me)
+
+---
+
+## Funcionalidades principais
+
+* Cadastro e autenticação de usuários (login / logout).
+* CRUD completo de usuários (criar, ler, atualizar, remover).
+* Upload, download e exclusão de arquivos.
+* Organização de arquivos por pastas e permissões básicas por usuário.
+* Interface inicial (dashboard) com ferramentas úteis voltadas para alunos.
+* Pronto para rodar em ambiente local com XAMPP.
+
+---
+
+## Tecnologias
+
+* PHP (procedural / MVC leve — adapte ao seu estilo)
 * MySQL / MariaDB (via XAMPP)
-* HTML5 / CSS3
-* Fontes do Google Fonts (Roboto)
-* Sessions para autenticação
+* HTML / CSS / JavaScript (front-end básico)
 
 ---
 
-## Estrutura de Pastas
+## Requisitos
+
+* Sistema operacional: Windows (recomendado para XAMPP), Linux ou macOS.
+* XAMPP (Apache + PHP + MySQL). Use uma versão do XAMPP que contenha PHP compatível com o projeto (ex.: PHP 8.x).
+* Navegador moderno (Chrome, Firefox, Edge).
+
+---
+
+## Instalação (Rápido — XAMPP no Windows)
+
+**1. Instale o XAMPP**
+
+* Baixe em [https://www.apachefriends.org](https://www.apachefriends.org) e instale.
+* Abra o XAMPP Control Panel e inicie **Apache** e **MySQL**.
+
+**2. Copie o projeto para `htdocs`**
+
+* Coloque a pasta `cjr-system` em `C:/xampp/htdocs/cjr-system`.
+
+**3. Crie o banco de dados**
+
+* Acesse `http://localhost/phpmyadmin/` e crie o banco `cjr_system` (utf8mb4\_unicode\_ci).
+* Importe `database/dba.sql` (se existir) ou execute os scripts em `database/`.
+
+**4. Ajuste as configurações**
+
+* Abra `config.php` (ou `app/config.php`) e configure as credenciais do banco.
+
+```php
+// Exemplo de config.php
+$db_host = '127.0.0.1';
+$db_name = 'cjr_system';
+$db_user = 'root';
+$db_pass = ''; // senha padrão do XAMPP é vazia
+
+try {
+    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die('Erro ao conectar ao banco: ' . $e->getMessage());
+}
+```
+
+**5. Crie a pasta de uploads**
+
+* `C:/xampp/htdocs/cjr-system/uploads`
+* Garanta permissão de escrita (no Windows normalmente não é necessário alterar).
+
+**6. Abra a aplicação**
+
+* Acesse: `http://localhost/cjr-system/` e registre-se ou faça login.
+
+---
+
+## Estrutura sugerida de pastas
 
 ```
-neno-drive/
-│
-├─ index.php          # Tela inicial com título e botões de login/cadastro
-├─ register.php       # Cadastro de usuários
-├─ login.php          # Tela de login
-├─ dashboard.php      # Área principal do usuário
-├─ alterar_senha.php  # Alteração de senha do usuário logado
-├─ alterar_senha_aluno.php # Professores/Admin podem alterar senha de alunos
-├─ db.php             # Conexão com banco de dados
-├─ uploads/           # Pasta para armazenar arquivos dos usuários
-└─ README.md          # Este arquivo
+cjr-system/
+├─ app/
+│  ├─ controllers/
+│  ├─ models/
+│  └─ views/
+├─ public/
+│  ├─ assets/
+│  └─ index.php
+├─ uploads/
+├─ database/
+│  └─ dba.sql
+├─ config.php
+└─ README.md
 ```
 
 ---
 
-## Banco de Dados
+## Boas práticas de segurança
 
-**Tabela `usuarios`**:
-
-```sql
-CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL UNIQUE,
-  `senha` varchar(255) NOT NULL,
-  `type` enum('user','professor','admin') DEFAULT 'user',
-  PRIMARY KEY (`id`)
-);
-```
+* Nunca use `root` com senha vazia em produção.
+* Armazene senhas com `password_hash()` (bcrypt) e verifique com `password_verify()`.
+* Proteja contra SQL Injection (use prepared statements) e XSS (escape em saídas).
+* Valide tipos e tamanho de arquivos no upload.
+* Não exponha caminhos absolutos em downloads; sirva arquivos via script que verifica permissões.
+* Use HTTPS em produção.
 
 ---
 
-## Como Usar
+## Dicas rápidas para debug
 
-1. Instale o [XAMPP](https://www.apachefriends.org/) ou outro servidor local PHP + MySQL.
-2. Crie um banco de dados e importe a tabela `usuarios`.
-3. Configure a conexão com o banco em `db.php`.
-4. Coloque todos os arquivos na pasta `htdocs` do XAMPP.
-5. Acesse `http://localhost/neno-drive/` pelo navegador.
-6. Faça o cadastro ou login e comece a usar o sistema.
+* Erro de conexão: verifique `config.php` e se o MySQL está rodando.
+* Uploads falhando: confira `upload_max_filesize` e `post_max_size` no `php.ini` e permissões da pasta `uploads`.
+* Error 500 / tela branca: habilite display de erros em ambiente de desenvolvimento ou cheque `apache/error.log`.
 
 ---
 
-## Autor
+## Contribuições
 
-**Matheus Pereira da Silva (Suetham)**
-Neno Drive - Sistema de gerenciamento de arquivos escolares.
+Contribuições são bem-vindas:
+
+1. Fork do repositório.
+2. `git checkout -b feat/nova-funcionalidade`
+3. `git commit -m "Descrição do que foi feito"`
+4. Abra um Pull Request.
+
+---
+
+## Recursos futuros (ideias)
+
+* Roles & permissions mais detalhados.
+* API REST para gerenciar arquivos.
+* Versões e histórico de arquivos.
+* Integração com serviços de nuvem (opcional).
+
+---
+
+## Créditos e contato
+
+Desenvolvido por **Matheus Pereira da Silva** (CEO da Sophira) para o **Centro da Juventude e Restinga**.
+
+Website: [https://sophira.me](https://sophira.me)
+
+E-mail de contato: **[matheuspsghx@gmail.com](mailto:matheuspsghx@gmail.com)**
 
 ---
 
 ## Licença
 
-Este projeto é gratuito e pode ser utilizado e modificado livremente para fins educacionais.
+Escolha uma licença apropriada (ex.: MIT):
+
+```
+MIT License
+Copyright (c) YEAR Matheus Pereira da Silva
+```
+
+---
